@@ -1,0 +1,2412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attendance Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+               font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: #0f172a;
+            min-height: 100vh;
+            padding: 20px;
+        background: #0f172a;
+        background-image: 
+        radial-gradient(at 20% 80%, hsla(220,70%,15%,0.8) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, hsla(240,70%,25%,0.6) 0px, transparent 50%),
+        radial-gradient(at 40% 40%, hsla(280,70%,20%,0.4) 0px, transparent 50%);
+              min-height: 100vh;
+        color: white;
+        overflow-x: hidden;
+        padding: 20px;
+
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .class-management, .teacher-management, .timetable-management, .student-management, .attendance-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+
+        .class-controls, .teacher-controls, .timetable-controls, .add-student {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .class-select {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        select, input, button {
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #339af0, #228be6);
+        }
+
+        .add-student input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .student-list, .teacher-list, .timetable-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .student-item, .teacher-item, .timetable-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .student-item:hover, .teacher-item:hover, .timetable-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-info, .teacher-info, .timetable-info {
+            flex: 1;
+        }
+
+        .student-name, .teacher-name, .timetable-subject {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .student-roll, .teacher-phone, .timetable-teacher {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .attendance-section .date-selector {
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .attendance-section .date-selector input {
+            margin: 0;
+        }
+
+        .attendance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .attendance-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .attendance-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .attendance-card::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .attendance-card.status-present::before {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            box-shadow: 0 0 10px rgba(81, 207, 102, 0.4);
+        }
+
+        .attendance-card.status-absent::before {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+
+        .status-badge.present {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            border-color: #51cf66;
+            box-shadow: 0 2px 8px rgba(81, 207, 102, 0.3);
+        }
+
+        .status-badge.absent {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border-color: #ff6b6b;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+        }
+
+        .attendance-card.status-present {
+            border-left: 5px solid #51cf66;
+            background: linear-gradient(135deg, rgba(81, 207, 102, 0.03), rgba(64, 192, 87, 0.01));
+        }
+
+        .attendance-card.status-absent {
+            border-left: 5px solid #ff6b6b;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.03), rgba(238, 90, 82, 0.01));
+        }
+
+        .attendance-info {
+            margin-bottom: 15px;
+            padding-right: 40px;
+        }
+
+        .attendance-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .attendance-buttons button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-present {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+        }
+
+        .btn-absent {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .attendance-buttons button.active {
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+            transform: scale(0.98);
+        }
+
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .stat-total {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .stat-present {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+        }
+
+        .stat-absent {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .tutor-settings {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .tutor-settings h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .whatsapp-btn {
+            background: linear-gradient(135deg, #25d366, #128c7e) !important;
+        }
+
+        .no-class {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .subject-attendance-section {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .subject-attendance-section h4 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .timetable-day-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+        }
+
+        .timetable-day-section h5 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .timetable-entry {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .timetable-entry input, .timetable-entry select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .timetable-entry button {
+            flex-shrink: 0;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: none;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 15px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+
+        .modal h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .student-details-grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .subject-stats {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .subject-stats h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .stats-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .custom-attendance-section {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .custom-attendance-section h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .custom-attendance-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .custom-attendance-form select,
+        .custom-attendance-form input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .custom-attendance-list {
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .custom-record-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .custom-record-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-record-info {
+            flex: 1;
+        }
+
+        .custom-record-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .custom-record-details {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .custom-record-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .class-controls, .teacher-controls, .timetable-controls, .add-student, .date-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .class-controls > *, .teacher-controls > *, .timetable-controls > *, .add-student > *, .date-selector > * {
+                width: 100%;
+            }
+            
+            .attendance-buttons {
+                flex-direction: column;
+            }
+
+            .attendance-info {
+                padding-right: 30px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 2% auto;
+            }
+
+            .student-actions {
+                flex-direction: column;
+            }
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .background-pattern {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+            animation: floatPattern 20s ease-in-out infinite;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+
+<div class="background-pattern"></div>
+
+    <!-- Student Details Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeStudentModal()">&times;</span>
+            <h2 id="modalStudentName">Student Details</h2>
+            <div id="studentDetailsContent">
+                <!-- Student details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📚 Multi-Class Attendance System</h1>
+            <p>Manage attendance for multiple classes efficiently</p>
+        </div>
+
+        <!-- Class Management Section -->
+        <div class="class-management">
+            <h3>🏫 Class Management</h3>
+            <div class="class-controls">
+                <div class="class-select">
+                    <select id="classSelect">
+                        <option value="">Select a class...</option>
+                    </select>
+                </div>
+                <input type="text" id="newClassName" placeholder="Enter new class name">
+                <button onclick="createClass()">Create Class</button>
+                <button class="btn-danger" onclick="deleteClass()">Delete Class</button>
+            </div>
+        </div>
+
+        <div id="classContent">
+            <div class="no-class">
+                <h3>No class selected</h3>
+                <p>Please select an existing class or create a new one to get started.</p>
+            </div>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <!-- Teacher Management Section -->
+            <div class="teacher-management">
+                <h3>👨‍🏫 Teacher Management</h3>
+                <div class="teacher-controls">
+                    <input type="text" id="teacherName" placeholder="Teacher Name">
+                    <input type="tel" id="teacherPhone" placeholder="WhatsApp Number (e.g., +1234567890)">
+                    <button onclick="addTeacher()">Add Teacher</button>
+                </div>
+                <div class="teacher-list" id="teacherList"></div>
+            </div>
+
+            <!-- Timetable Management Section -->
+            <div class="timetable-management">
+                <h3>🗓️ Timetable Management</h3>
+                <div class="timetable-controls">
+                    <select id="timetableDaySelect">
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+                    <input type="text" id="timetableSubjectName" placeholder="Subject Name (e.g., Math, Physics)">
+                    <select id="timetableTeacherSelect">
+                        <option value="">Select Teacher</option>
+                    </select>
+                    <input type="text" id="timetableHour" placeholder="Hour/Period (e.g., 1, 2, A, B)" style="max-width: 150px;">
+                    <button onclick="addTimetableEntry()">Add Subject to Timetable</button>
+                </div>
+                <div id="timetableDisplay">
+                    <!-- Timetable entries will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Student Management Section -->
+            <div class="student-management">
+                <h3>👥 Student Management</h3>
+                <div class="add-student">
+                    <input type="text" id="studentName" placeholder="Student Name">
+                    <input type="text" id="studentRoll" placeholder="Roll Number">
+                    <button onclick="addStudent()">Add Student</button>
+                    <button class="btn-success" onclick="exportData()">Export Data</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData()">
+                    <button class="btn-success" onclick="document.getElementById('importFile').click()">Import Data</button>
+                </div>
+                <div class="tutor-settings">
+                    <h4>📱 Class Tutor WhatsApp Number (for general reports)</h4>
+                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                        <input type="tel" id="tutorPhone" placeholder="Tutor's WhatsApp Number (with country code)" style="flex: 1; min-width: 250px;">
+                        <button onclick="saveTutorPhone()">Save Number</button>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Example: +1234567890 (include country code without spaces)
+                    </small>
+                </div>
+
+                <!-- Button to open Custom Attendance Section -->
+                <button class="btn-info" style="margin-top: 20px;" onclick="toggleCustomAttendanceSection()">
+                    Manage Custom Attendance
+                </button>
+
+                <!-- Custom Attendance Addition Section - Initially Hidden -->
+                <div id="customAttendanceSection" class="custom-attendance-section" style="display: none;">
+                    <h4>📈 Manage Custom Attendance for Students</h4>
+                    <div class="custom-attendance-form">
+                        <select id="customStudentSelect">
+                            <option value="">Select Student</option>
+                        </select>
+                        <select id="customSubjectSelect">
+                            <option value="">Select Subject</option>
+                        </select>
+                        <input type="number" id="customPresentDays" placeholder="Present Days" min="0">
+                        <input type="number" id="customTotalDays" placeholder="Total Days" min="1">
+                        <button onclick="addCustomAttendance()">Add/Update Custom Attendance</button>
+                        <button class="btn-info" onclick="viewAllCustomAttendance()">View All Custom Records</button>
+                        <button class="btn-info" onclick="hideCustomAttendanceList()">Hide Records</button>
+                        <button class="btn-danger" onclick="clearAllCustomAttendance()">Clear All Custom Records</button>
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Use this to add/update initial attendance records. Custom records persist until manually removed.
+                    </small>
+                    <div id="customAttendanceList" style="margin-top: 15px;"></div>
+                </div>
+
+                <div class="student-list" id="studentList"></div>
+            </div>
+
+            <!-- Attendance Section -->
+            <div class="attendance-section">
+                <h3>⏰ Hourly/Subject Attendance</h3>
+                <div class="date-selector">
+                    <label>Date: </label>
+                    <input type="date" id="attendanceDate">
+                    <button onclick="loadAttendance()">Load Attendance</button>
+                    <button class="btn-success" onclick="saveAttendance()">Save Attendance</button>
+                    <button class="btn-danger" onclick="sendAbsenteesToWhatsAppBySubject()" style="background: linear-gradient(135deg, #25d366, #128c7e);">📱 Send Subject Reports to Teachers</button>
+                    <button class="btn-danger" onclick="sendAbsenteesToTutor()" style="background: linear-gradient(135deg, #25d366, #128c7e);">📱 Send Absentees to Tutor</button>
+                </div>
+                <div id="hourlyAttendanceGrid">
+                    <!-- Subject-wise attendance grids will be loaded here -->
+                </div>
+                <div class="stats" id="stats" style="display: none;"></div>
+            </div>
+
+            <!-- History Section -->
+            <div class="attendance-section">
+                <h3>📜 Attendance History</h3>
+                <div class="date-selector">
+                    <label>View History for Date:</label>
+                    <input type="date" id="historyDate">
+                    <button class="btn-info" onclick="viewHistoricalAttendance()">View History</button>
+                </div>
+                <div id="historicalAttendanceDisplay">
+                    <!-- Historical attendance will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Replace with your actual config) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+      // Your web app's Firebase configuration
+      // IMPORTANT: Replace these with your actual Firebase project configuration
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY", // e.g., "AIzaSyC_YOUR_API_KEY"
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com", // e.g., "my-attendance-app-12345.firebaseapp.com"
+        projectId: "YOUR_PROJECT_ID", // e.g., "my-attendance-app-12345"
+        storageBucket: "YOUR_PROJECT_ID.appspot.com", // e.g., "my-attendance-app-12345.appspot.com"
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // e.g., "1234567890"
+        appId: "YOUR_APP_ID" // e.g., "1:1234567890:web:abcdef1234567890abcdef"
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+    </script>
+
+    <script>
+        let classesData = {};
+        let currentClass = '';
+
+        async function initApp() {
+            await loadFromMemory(); // Await loading from Firestore
+            populateClassSelect();
+            setTodayDate();
+            // If a class was previously selected, re-select it
+            const lastSelectedClass = localStorage.getItem('lastSelectedClass');
+            if (lastSelectedClass && classesData[lastSelectedClass]) {
+                selectClass(lastSelectedClass);
+            } else if (Object.keys(classesData).length > 0) {
+                // If no last selected, but classes exist, select the first one
+                selectClass(Object.keys(classesData)[0]);
+            } else {
+                showNoClassMessage();
+            }
+        }
+
+        // Memory storage functions (now using Firestore)
+        async function saveToMemory() {
+            if (!currentClass) return;
+            try {
+                // Save class-level data (teachers, timetable, tutorPhone)
+                await db.collection('classes').doc(currentClass).set({
+                    name: currentClass,
+                    tutorPhone: classesData[currentClass].tutorPhone,
+                    teachers: classesData[currentClass].teachers,
+                    timetable: classesData[currentClass].timetable
+                }, { merge: true }); // Use merge to update specific fields without overwriting
+
+                // Save students (each as a sub-document)
+                const studentsCollection = db.collection('classes').doc(currentClass).collection('students');
+                for (const student of classesData[currentClass].students) {
+                    // Include customAttendance directly in student document for simplicity
+                    const studentDataToSave = {
+                        name: student.name,
+                        roll: student.roll,
+                        customAttendance: classesData[currentClass].customAttendance[student.roll] || {}
+                    };
+                    await studentsCollection.doc(student.roll).set(studentDataToSave, { merge: true });
+                }
+
+                // Save daily attendance (each date as a sub-document)
+                const dailyAttendanceCollection = db.collection('classes').doc(currentClass).collection('dailyAttendance');
+                for (const date in classesData[currentClass].attendance) {
+                    await dailyAttendanceCollection.doc(date).set(classesData[currentClass].attendance[date]);
+                }
+
+                localStorage.setItem('lastSelectedClass', currentClass); // Still use local storage for last selected class
+                console.log("Data saved to Firestore successfully!");
+            } catch (error) {
+                console.error("Error saving to Firestore:", error);
+                alert("Error saving data. Check console for details.");
+            }
+        }
+
+        async function loadFromMemory() {
+            try {
+                const classesSnapshot = await db.collection('classes').get();
+                classesData = {};
+                for (const doc of classesSnapshot.docs) {
+                    const classDoc = doc.data();
+                    const className = doc.id; // Use document ID as class name
+
+                    classesData[className] = {
+                        name: classDoc.name,
+                        tutorPhone: classDoc.tutorPhone || '',
+                        teachers: classDoc.teachers || {},
+                        timetable: classDoc.timetable || {
+                            "Monday": [], "Tuesday": [], "Wednesday": [],
+                            "Thursday": [], "Friday": [], "Saturday": [], "Sunday": []
+                        },
+                        students: [], // Will be populated from subcollection
+                        attendance: {}, // Will be populated from subcollection
+                        customAttendance: {} // Will be populated from subcollection
+                    };
+
+                    // Load students and their custom attendance
+                    const studentsSnapshot = await db.collection('classes').doc(className).collection('students').get();
+                    classesData[className].students = studentsSnapshot.docs.map(studentDoc => {
+                        const studentData = studentDoc.data();
+                        if (studentData.customAttendance) {
+                            classesData[className].customAttendance[studentData.roll] = studentData.customAttendance;
+                        }
+                        return { name: studentData.name, roll: studentData.roll };
+                    });
+
+                    // Load daily attendance
+                    const dailyAttendanceSnapshot = await db.collection('classes').doc(className).collection('dailyAttendance').get();
+                    dailyAttendanceSnapshot.forEach(dailyDoc => {
+                        classesData[className].attendance[dailyDoc.id] = dailyDoc.data();
+                    });
+                }
+
+                console.log("Data loaded from Firestore successfully!");
+            } catch (error) {
+                console.error("Error loading from Firestore:", error);
+                alert("Error loading data. Check console for details. Falling back to sample data.");
+                // Fallback to sample data if Firestore fails or is empty
+                classesData = {
+                    "S5 CSE & DS": {
+                        students: [
+                            { name: "ABHINAV MANAKKAL", roll: "ECE23CS001" },
+                            { name: "ABIJITH. B", roll: "ECE23CS002" },
+                            { name: "ABIN ROY", roll: "ECE23CS003" }
+                        ],
+                        attendance: {},
+                        customAttendance: {},
+                        tutorPhone: '',
+                        teachers: {
+                            "Dr. Smith": "+11234567890",
+                            "Prof. Johnson": "+11987654321"
+                        },
+                        timetable: {
+                            "Monday": [
+                                { subject: "Data Structures", teacher: "Dr. Smith", hour: "1" },
+                                { subject: "Data Structures", teacher: "Dr. Smith", hour: "2" },
+                                { subject: "Algorithms", teacher: "Prof. Johnson", hour: "3" }
+                            ],
+                            "Tuesday": [
+                                { subject: "Operating Systems", teacher: "Dr. Smith", hour: "1" }
+                            ]
+                        }
+                    }
+                };
+                await saveToMemory(); // Save sample data to Firestore if it was empty
+            }
+        }
+
+        // Class management functions
+        async function createClass() {
+            const className = document.getElementById('newClassName').value.trim();
+            if (!className) {
+                alert('Please enter a class name');
+                return;
+            }
+            
+            if (classesData[className]) {
+                alert('Class already exists');
+                return;
+            }
+
+            classesData[className] = {
+                students: [],
+                attendance: {},
+                customAttendance: {},
+                tutorPhone: '',
+                teachers: {},
+                timetable: {
+                    "Monday": [], "Tuesday": [], "Wednesday": [],
+                    "Thursday": [], "Friday": [], "Saturday": [], "Sunday": []
+                }
+            };
+            
+            document.getElementById('newClassName').value = '';
+            populateClassSelect();
+            selectClass(className);
+            await saveToMemory();
+        }
+
+        async function deleteClass() {
+            if (!currentClass) {
+                alert('Please select a class to delete');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete "${currentClass}"? This action cannot be undone.`)) {
+                try {
+                    // Delete subcollections first (Firestore doesn't delete subcollections automatically)
+                    const studentsSnapshot = await db.collection('classes').doc(currentClass).collection('students').get();
+                    const attendanceSnapshot = await db.collection('classes').doc(currentClass).collection('dailyAttendance').get();
+
+                    const batch = db.batch();
+                    studentsSnapshot.forEach(doc => batch.delete(doc.ref));
+                    attendanceSnapshot.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+
+                    await db.collection('classes').doc(currentClass).delete();
+                    
+                    delete classesData[currentClass];
+                    currentClass = '';
+                    populateClassSelect();
+                    showNoClassMessage();
+                    localStorage.removeItem('lastSelectedClass'); // Clear last selected class
+                    alert('Class deleted successfully!');
+                } catch (error) {
+                    console.error("Error deleting class:", error);
+                    alert("Error deleting class. Check console for details.");
+                }
+            }
+        }
+
+        function populateClassSelect() {
+            const select = document.getElementById('classSelect');
+            select.innerHTML = '<option value="">Select a class...</option>';
+            
+            Object.keys(classesData).forEach(className => {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                select.appendChild(option);
+            });
+
+            select.value = currentClass;
+
+            select.onchange = function() {
+                if (this.value) {
+                    selectClass(this.value);
+                } else {
+                    showNoClassMessage();
+                }
+            };
+        }
+
+        async function selectClass(className) {
+            currentClass = className;
+            document.getElementById('classSelect').value = className;
+            showMainContent();
+            // Reload all data for the selected class from Firestore
+            await loadStudents();
+            await loadTutorPhone();
+            await loadTeachers();
+            await loadTimetable();
+            await loadAttendance();
+            populateCustomAttendanceDropdowns();
+            localStorage.setItem('lastSelectedClass', currentClass);
+        }
+
+        function showNoClassMessage() {
+            document.getElementById('classContent').innerHTML = `
+                <div class="no-class">
+                    <h3>No class selected</h3>
+                    <p>Please select an existing class or create a new one to get started.</p>
+                </div>
+            `;
+            document.getElementById('mainContent').style.display = 'none';
+            currentClass = '';
+        }
+
+        function showMainContent() {
+            document.getElementById('classContent').innerHTML = '';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        // Student management functions
+        async function addStudent() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const name = document.getElementById('studentName').value.trim();
+            const roll = document.getElementById('studentRoll').value.trim();
+
+            if (!name || !roll) {
+                alert('Please enter both name and roll number');
+                return;
+            }
+
+            if (classesData[currentClass].students.some(s => s.roll === roll)) {
+                alert('Roll number already exists');
+                return;
+            }
+
+            const newStudent = { name, roll };
+            classesData[currentClass].students.push(newStudent);
+            
+            try {
+                await db.collection('classes').doc(currentClass).collection('students').doc(roll).set(newStudent);
+                document.getElementById('studentName').value = '';
+                document.getElementById('studentRoll').value = '';
+                
+                loadStudents();
+                populateCustomAttendanceDropdowns();
+                alert('Student added successfully!');
+            } catch (error) {
+                console.error("Error adding student:", error);
+                alert("Error adding student. Check console for details.");
+            }
+        }
+
+        async function removeStudent(rollToRemove) {
+            if (confirm('Are you sure you want to remove this student? This will also remove their attendance records.')) {
+                try {
+                    // Remove student document
+                    await db.collection('classes').doc(currentClass).collection('students').doc(rollToRemove).delete();
+
+                    // Remove student from local classesData
+                    const initialLength = classesData[currentClass].students.length;
+                    classesData[currentClass].students = classesData[currentClass].students.filter(s => s.roll !== rollToRemove);
+
+                    if (classesData[currentClass].students.length < initialLength) {
+                        // Remove student from all daily attendance records in Firestore
+                        const attendanceSnapshot = await db.collection('classes').doc(currentClass).collection('dailyAttendance').get();
+                        const batch = db.batch();
+                        attendanceSnapshot.forEach(doc => {
+                            const attendanceData = doc.data();
+                            // Iterate through subjectHourKeys and remove student's entry
+                            for (const subjectHourKey in attendanceData) {
+                                if (attendanceData[subjectHourKey] && attendanceData[subjectHourKey][rollToRemove]) {
+                                    delete attendanceData[subjectHourKey][rollToRemove];
+                                }
+                            }
+                            batch.set(doc.ref, attendanceData); // Use set to overwrite with updated data
+                        });
+                        await batch.commit();
+
+                        // Remove from custom attendance in local data
+                        if (classesData[currentClass].customAttendance[rollToRemove]) {
+                            delete classesData[currentClass].customAttendance[rollToRemove];
+                        }
+                        
+                        loadStudents();
+                        loadAttendance();
+                        populateCustomAttendanceDropdowns();
+                        alert('Student removed successfully!');
+                    } else {
+                        alert('Student not found.');
+                    }
+                } catch (error) {
+                    console.error("Error removing student:", error);
+                    alert("Error removing student. Check console for details.");
+                }
+            }
+        }
+
+        async function loadStudents() {
+            if (!currentClass) return;
+
+            const studentList = document.getElementById('studentList');
+            studentList.innerHTML = '';
+            
+            try {
+                const studentsSnapshot = await db.collection('classes').doc(currentClass).collection('students').get();
+                classesData[currentClass].students = []; // Clear existing local data
+                classesData[currentClass].customAttendance = {}; // Clear existing custom attendance
+
+                studentsSnapshot.forEach(doc => {
+                    const studentData = doc.data();
+                    classesData[currentClass].students.push({ name: studentData.name, roll: studentData.roll });
+                    if (studentData.customAttendance) {
+                        classesData[currentClass].customAttendance[studentData.roll] = studentData.customAttendance;
+                    }
+                });
+
+                classesData[currentClass].students.forEach(student => {
+                    const studentDiv = document.createElement('div');
+                    studentDiv.className = 'student-item';
+                    studentDiv.innerHTML = `
+                        <div class="student-info">
+                            <div class="student-name">${student.name}</div>
+                            <div class="student-roll">Roll: ${student.roll}</div>
+                        </div>
+                        <div class="student-actions">
+                            <button class="btn-info" onclick="showStudentDetails('${student.roll}')">View Details</button>
+                            <button class="btn-danger" onclick="removeStudent('${student.roll}')">Remove</button>
+                        </div>
+                    `;
+                    studentList.appendChild(studentDiv);
+                });
+            } catch (error) {
+                console.error("Error loading students:", error);
+                alert("Error loading students. Check console for details.");
+            }
+        }
+
+        // Student Details Modal Functions
+        function showStudentDetails(studentRoll) {
+            const student = classesData[currentClass].students.find(s => s.roll === studentRoll);
+            if (!student) return;
+
+            document.getElementById('modalStudentName').textContent = `${student.name} (${student.roll})`;
+            
+            const detailsContent = document.getElementById('studentDetailsContent');
+            detailsContent.innerHTML = '';
+
+            // Get all unique subjects from timetable
+            const allSubjects = new Set();
+            Object.values(classesData[currentClass].timetable).forEach(daySchedule => {
+                daySchedule.forEach(entry => allSubjects.add(entry.subject));
+            });
+
+            if (allSubjects.size === 0) {
+                detailsContent.innerHTML = '<p>No subjects found in timetable.</p>';
+                document.getElementById('studentModal').style.display = 'block';
+                return;
+            }
+
+            const detailsGrid = document.createElement('div');
+            detailsGrid.className = 'student-details-grid';
+
+            allSubjects.forEach(subject => {
+                const stats = calculateStudentSubjectStats(studentRoll, subject);
+                
+                const subjectDiv = document.createElement('div');
+                subjectDiv.className = 'subject-stats';
+                subjectDiv.innerHTML = `
+                    <h4>${subject}</h4>
+                    <div class="stats-row">
+                        <span>Present Hours:</span>
+                        <span><strong>${stats.present}</strong></span>
+                    </div>
+                    <div class="stats-row">
+                        <span>Total Hours:</span>
+                        <span><strong>${stats.total}</strong></span>
+                    </div>
+                    <div class="stats-row">
+                        <span>Attendance Percentage:</span>
+                        <span><strong>${stats.percentage.toFixed(1)}%</strong></span>
+                    </div>
+                `;
+                detailsGrid.appendChild(subjectDiv);
+            });
+
+            // Overall statistics
+            const overallStats = calculateStudentOverallStats(studentRoll);
+            const overallDiv = document.createElement('div');
+            overallDiv.className = 'subject-stats';
+            overallDiv.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            overallDiv.style.color = 'white';
+            overallDiv.innerHTML = `
+                <h4>📊 Overall Statistics</h4>
+                <div class="stats-row">
+                    <span>Total Present Hours:</span>
+                    <span><strong>${overallStats.present}</strong></span>
+                </div>
+                <div class="stats-row">
+                    <span>Total Hours:</span>
+                    <span><strong>${overallStats.total}</strong></span>
+                </div>
+                <div class="stats-row">
+                    <span>Overall Percentage:</span>
+                    <span><strong>${overallStats.percentage.toFixed(1)}%</strong></span>
+                </div>
+            `;
+            
+            detailsContent.appendChild(overallDiv);
+            detailsContent.appendChild(detailsGrid);
+            
+            document.getElementById('studentModal').style.display = 'block';
+        }
+
+        function closeStudentModal() {
+            document.getElementById('studentModal').style.display = 'none';
+        }
+
+        function calculateStudentSubjectStats(studentRoll, subject) {
+            if (!currentClass || !classesData[currentClass]) {
+                return { present: 0, total: 0, percentage: 0 };
+            }
+
+            let present = 0;
+            let total = 0;
+
+            // Add custom attendance first
+            const customAttendance = classesData[currentClass].customAttendance[studentRoll];
+            if (customAttendance && customAttendance[subject]) {
+                present += customAttendance[subject].present || 0;
+                total += customAttendance[subject].total || 0;
+            }
+
+            // Add regular attendance
+            const attendanceRecords = classesData[currentClass].attendance;
+            for (const date in attendanceRecords) {
+                const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
+                const timetableForDay = classesData[currentClass].timetable[dayOfWeek] || [];
+                
+                timetableForDay.forEach(entry => {
+                    if (entry.subject === subject) {
+                        const subjectHourKey = `${subject}_${entry.hour}`;
+                        const dayAttendance = attendanceRecords[date][subjectHourKey];
+                        
+                        if (dayAttendance && dayAttendance[studentRoll]) {
+                            total++;
+                            if (dayAttendance[studentRoll] === 'present') {
+                                present++;
+                            }
+                        }
+                    }
+                });
+            }
+
+            const percentage = total > 0 ? (present / total) * 100 : 0;
+            return { present, total, percentage };
+        }
+
+        function calculateStudentOverallStats(studentRoll) {
+            if (!currentClass || !classesData[currentClass]) {
+                return { present: 0, total: 0, percentage: 0 };
+            }
+
+            let totalPresent = 0;
+            let totalHours = 0;
+
+            // Get all unique subjects
+            const allSubjects = new Set();
+            Object.values(classesData[currentClass].timetable).forEach(daySchedule => {
+                daySchedule.forEach(entry => allSubjects.add(entry.subject));
+            });
+
+            allSubjects.forEach(subject => {
+                const stats = calculateStudentSubjectStats(studentRoll, subject);
+                totalPresent += stats.present;
+                totalHours += stats.total;
+            });
+
+            const percentage = totalHours > 0 ? (totalPresent / totalHours) * 100 : 0;
+            return { present: totalPresent, total: totalHours, percentage };
+        }
+
+        // Custom Attendance Functions
+        function toggleCustomAttendanceSection() {
+            const section = document.getElementById('customAttendanceSection');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                populateCustomAttendanceDropdowns(); // Populate dropdowns when opening
+                loadCustomAttendanceList(); // Load existing records
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function populateCustomAttendanceDropdowns() {
+            if (!currentClass) return;
+
+            const studentSelect = document.getElementById('customStudentSelect');
+            const subjectSelect = document.getElementById('customSubjectSelect');
+            
+            // Populate students
+            studentSelect.innerHTML = '<option value="">Select Student</option>';
+            classesData[currentClass].students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.roll;
+                option.textContent = `${student.name} (${student.roll})`;
+                studentSelect.appendChild(option);
+            });
+
+            // Populate subjects from timetable
+            subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            const subjects = new Set();
+            Object.values(classesData[currentClass].timetable).forEach(daySchedule => {
+                daySchedule.forEach(entry => subjects.add(entry.subject));
+            });
+            
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelect.appendChild(option);
+            });
+        }
+
+        async function addCustomAttendance() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const studentRoll = document.getElementById('customStudentSelect').value;
+            const subject = document.getElementById('customSubjectSelect').value;
+            const presentDays = parseInt(document.getElementById('customPresentDays').value);
+            const totalDays = parseInt(document.getElementById('customTotalDays').value);
+
+            if (!studentRoll || !subject) {
+                alert('Please select both student and subject');
+                return;
+            }
+
+            if (isNaN(presentDays) || isNaN(totalDays) || totalDays < 1 || presentDays < 0 || presentDays > totalDays) {
+                alert('Please enter valid attendance numbers (Present days ≤ Total days)');
+                return;
+            }
+
+            if (!classesData[currentClass].customAttendance[studentRoll]) {
+                classesData[currentClass].customAttendance[studentRoll] = {};
+            }
+
+            const studentName = classesData[currentClass].students.find(s => s.roll === studentRoll).name;
+            const isUpdate = classesData[currentClass].customAttendance[studentRoll][subject];
+
+            classesData[currentClass].customAttendance[studentRoll][subject] = {
+                present: presentDays,
+                total: totalDays
+            };
+
+            try {
+                // Update custom attendance directly in the student document in Firestore
+                await db.collection('classes').doc(currentClass).collection('students').doc(studentRoll).update({
+                    [`customAttendance.${subject}`]: { present: presentDays, total: totalDays }
+                });
+
+                // Clear form
+                document.getElementById('customStudentSelect').value = '';
+                document.getElementById('customSubjectSelect').value = '';
+                document.getElementById('customPresentDays').value = '';
+                document.getElementById('customTotalDays').value = '';
+
+                alert(`Custom attendance ${isUpdate ? 'updated' : 'added'} for ${studentName} in ${subject}`);
+                loadCustomAttendanceList();
+            } catch (error) {
+                console.error("Error adding/updating custom attendance:", error);
+                alert("Error adding/updating custom attendance. Check console for details.");
+            }
+        }
+
+        function hideCustomAttendanceList() {
+            document.getElementById('customAttendanceList').style.display = 'none';
+        }
+
+        function viewAllCustomAttendance() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const customAttendanceList = document.getElementById('customAttendanceList');
+            const customData = classesData[currentClass].customAttendance || {};
+
+            if (Object.keys(customData).length === 0) {
+                customAttendanceList.innerHTML = '<p style="color: #666; font-style: italic; text-align: center; padding: 20px;">No custom attendance records found.</p>';
+            }
+            
+            loadCustomAttendanceList(); // This will populate and show the list
+            customAttendanceList.style.display = 'block'; // Ensure it's visible
+        }
+
+        function loadCustomAttendanceList() {
+            if (!currentClass) return;
+
+            const customAttendanceList = document.getElementById('customAttendanceList');
+            const customData = classesData[currentClass].customAttendance || {};
+
+            if (Object.keys(customData).length === 0) {
+                customAttendanceList.innerHTML = '<p style="color: #666; font-style: italic; text-align: center; padding: 20px;">No custom attendance records found.</p>';
+                customAttendanceList.style.display = 'block';
+                return;
+            }
+
+            customAttendanceList.innerHTML = '<h5 style="color: #333; margin-bottom: 15px;">📋 Current Custom Attendance Records:</h5>';
+            customAttendanceList.style.display = 'block';
+
+            const recordsGrid = document.createElement('div');
+            recordsGrid.className = 'custom-attendance-list';
+
+            Object.keys(customData).forEach(studentRoll => {
+                const student = classesData[currentClass].students.find(s => s.roll === studentRoll);
+                const studentName = student ? student.name : `Unknown (${studentRoll})`;
+
+                Object.keys(customData[studentRoll]).forEach(subject => {
+                    const record = customData[studentRoll][subject];
+                    const percentage = record.total > 0 ? (record.present / record.total * 100).toFixed(1) : 0;
+
+                    const recordDiv = document.createElement('div');
+                    recordDiv.className = 'custom-record-item';
+                    recordDiv.innerHTML = `
+                        <div class="custom-record-info">
+                            <div class="custom-record-title">${studentName}</div>
+                            <div class="custom-record-details">
+                                <strong>${subject}</strong><br>
+                                Present: ${record.present} | Total: ${record.total} | ${percentage}%
+                            </div>
+                        </div>
+                        <div class="custom-record-actions">
+                            <button class="btn-info" onclick="editCustomRecord('${studentRoll}', '${subject}', ${record.present}, ${record.total})" style="font-size: 12px; padding: 8px;">Edit</button>
+                            <button class="btn-danger" onclick="deleteCustomRecord('${studentRoll}', '${subject}')" style="font-size: 12px; padding: 8px;">Delete</button>
+                        </div>
+                    `;
+                    recordsGrid.appendChild(recordDiv);
+                });
+            });
+
+            customAttendanceList.appendChild(recordsGrid);
+        }
+
+        function editCustomRecord(studentRoll, subject, currentPresent, currentTotal) {
+            // Pre-fill the form with current values
+            document.getElementById('customStudentSelect').value = studentRoll;
+            document.getElementById('customSubjectSelect').value = subject;
+            document.getElementById('customPresentDays').value = currentPresent;
+            document.getElementById('customTotalDays').value = currentTotal;
+
+            // Scroll to form
+            document.getElementById('customStudentSelect').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Highlight the form briefly
+            const form = document.querySelector('.custom-attendance-form');
+            form.style.background = '#e3f2fd';
+            setTimeout(() => {
+                form.style.background = '';
+            }, 2000);
+        }
+
+        async function deleteCustomRecord(studentRoll, subject) {
+            const student = classesData[currentClass].students.find(s => s.roll === studentRoll);
+            const studentName = student ? student.name : `Unknown (${studentRoll})`;
+
+            if (confirm(`Are you sure you want to delete the custom attendance record for ${studentName} in ${subject}?\n\nThis action cannot be undone.`)) {
+                try {
+                    // Delete the specific subject from customAttendance map in Firestore
+                    await db.collection('classes').doc(currentClass).collection('students').doc(studentRoll).update({
+                        [`customAttendance.${subject}`]: firebase.firestore.FieldValue.delete()
+                    });
+
+                    // Update local data
+                    if (classesData[currentClass].customAttendance[studentRoll]) {
+                        delete classesData[currentClass].customAttendance[studentRoll][subject];
+                        
+                        // If no more subjects for this student, remove the student entry
+                        if (Object.keys(classesData[currentClass].customAttendance[studentRoll]).length === 0) {
+                            delete classesData[currentClass].customAttendance[studentRoll];
+                            // Also remove the customAttendance field from the student document if it's empty
+                            await db.collection('classes').doc(currentClass).collection('students').doc(studentRoll).update({
+                                customAttendance: firebase.firestore.FieldValue.delete()
+                            });
+                        }
+                    }
+
+                    loadCustomAttendanceList();
+                    alert(`Custom attendance record deleted for ${studentName} in ${subject}`);
+                } catch (error) {
+                    console.error("Error deleting custom record:", error);
+                    alert("Error deleting custom record. Check console for details.");
+                }
+            }
+        }
+
+        async function clearAllCustomAttendance() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const customData = classesData[currentClass].customAttendance || {};
+            if (Object.keys(customData).length === 0) {
+                alert('No custom attendance records to clear.');
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete ALL custom attendance records?\n\nThis action cannot be undone and will affect all students\' attendance calculations.')) {
+                try {
+                    const studentsCollection = db.collection('classes').doc(currentClass).collection('students');
+                    const studentsSnapshot = await studentsCollection.get();
+                    const batch = db.batch();
+
+                    studentsSnapshot.forEach(doc => {
+                        batch.update(doc.ref, { customAttendance: firebase.firestore.FieldValue.delete() });
+                    });
+                    await batch.commit();
+
+                    classesData[currentClass].customAttendance = {};
+                    loadCustomAttendanceList();
+                    alert('All custom attendance records have been cleared.');
+                } catch (error) {
+                    console.error("Error clearing all custom attendance:", error);
+                    alert("Error clearing all custom attendance. Check console for details.");
+                }
+            }
+        }
+
+        // Teacher Management Functions
+        async function addTeacher() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+            const name = document.getElementById('teacherName').value.trim();
+            const phone = document.getElementById('teacherPhone').value.trim();
+
+            if (!name || !phone) {
+                alert('Please enter both teacher name and WhatsApp number.');
+                return;
+            }
+            const phoneRegex = /^\+[1-9]\d{1,14}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('Please enter a valid phone number with country code (e.g., +1234567890).');
+                return;
+            }
+
+            classesData[currentClass].teachers[name] = phone;
+            try {
+                await db.collection('classes').doc(currentClass).update({
+                    teachers: classesData[currentClass].teachers
+                });
+                document.getElementById('teacherName').value = '';
+                document.getElementById('teacherPhone').value = '';
+                loadTeachers();
+                alert('Teacher added successfully!');
+            } catch (error) {
+                console.error("Error adding teacher:", error);
+                alert("Error adding teacher. Check console for details.");
+            }
+        }
+
+        async function removeTeacher(teacherName) {
+            if (confirm(`Are you sure you want to remove teacher "${teacherName}"?`)) {
+                try {
+                    delete classesData[currentClass].teachers[teacherName];
+                    await db.collection('classes').doc(currentClass).update({
+                        teachers: classesData[currentClass].teachers
+                    });
+                    loadTeachers();
+                    loadTimetable(); // Timetable might need to update if teacher is removed
+                    alert('Teacher removed successfully!');
+                } catch (error) {
+                    console.error("Error removing teacher:", error);
+                    alert("Error removing teacher. Check console for details.");
+                }
+            }
+        }
+
+        async function loadTeachers() {
+            if (!currentClass) return;
+            const teacherListDiv = document.getElementById('teacherList');
+            teacherListDiv.innerHTML = '';
+            const teacherSelect = document.getElementById('timetableTeacherSelect');
+            teacherSelect.innerHTML = '<option value="">Select Teacher</option>';
+
+            try {
+                const classDoc = await db.collection('classes').doc(currentClass).get();
+                if (classDoc.exists) {
+                    classesData[currentClass].teachers = classDoc.data().teachers || {};
+                }
+
+                for (const name in classesData[currentClass].teachers) {
+                    const phone = classesData[currentClass].teachers[name];
+                    const teacherDiv = document.createElement('div');
+                    teacherDiv.className = 'teacher-item';
+                    teacherDiv.innerHTML = `
+                        <div class="teacher-info">
+                            <div class="teacher-name">${name}</div>
+                            <div class="teacher-phone">${phone}</div>
+                        </div>
+                        <button class="btn-danger" onclick="removeTeacher('${name}')">Remove</button>
+                    `;
+                    teacherListDiv.appendChild(teacherDiv);
+
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    teacherSelect.appendChild(option);
+                }
+            } catch (error) {
+                console.error("Error loading teachers:", error);
+                alert("Error loading teachers. Check console for details.");
+            }
+        }
+
+        // Timetable Management Functions
+        async function addTimetableEntry() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+            const day = document.getElementById('timetableDaySelect').value;
+            const subject = document.getElementById('timetableSubjectName').value.trim();
+            const teacher = document.getElementById('timetableTeacherSelect').value;
+            const hour = document.getElementById('timetableHour').value.trim();
+
+            if (!subject || !teacher || !hour) {
+                alert('Please fill all fields: subject, teacher, and hour.');
+                return;
+            }
+
+            if (!classesData[currentClass].timetable[day]) {
+                classesData[currentClass].timetable[day] = [];
+            }
+
+            // Check for duplicate subject-hour combination on the same day
+            if (classesData[currentClass].timetable[day].some(entry => entry.subject === subject && entry.hour === hour)) {
+                alert(`Subject "${subject}" with hour "${hour}" already exists for ${day}.`);
+                return;
+            }
+
+            classesData[currentClass].timetable[day].push({ subject, teacher, hour });
+            try {
+                await db.collection('classes').doc(currentClass).update({
+                    timetable: classesData[currentClass].timetable
+                });
+                document.getElementById('timetableSubjectName').value = '';
+                document.getElementById('timetableTeacherSelect').value = '';
+                document.getElementById('timetableHour').value = '';
+                loadTimetable();
+                populateCustomAttendanceDropdowns();
+                alert('Timetable entry added successfully!');
+            } catch (error) {
+                console.error("Error adding timetable entry:", error);
+                alert("Error adding timetable entry. Check console for details.");
+            }
+        }
+
+        async function removeTimetableEntry(day, subjectToRemove, hourToRemove) {
+            if (confirm(`Are you sure you want to remove "${subjectToRemove} (Hour ${hourToRemove})" from ${day}'s timetable?`)) {
+                classesData[currentClass].timetable[day] = classesData[currentClass].timetable[day].filter(
+                    entry => !(entry.subject === subjectToRemove && entry.hour === hourToRemove)
+                );
+                try {
+                    await db.collection('classes').doc(currentClass).update({
+                        timetable: classesData[currentClass].timetable
+                    });
+                    loadTimetable();
+                    populateCustomAttendanceDropdowns();
+                    alert('Timetable entry removed successfully!');
+                } catch (error) {
+                    console.error("Error removing timetable entry:", error);
+                    alert("Error removing timetable entry. Check console for details.");
+                }
+            }
+        }
+
+        async function loadTimetable() {
+            if (!currentClass) return;
+            const timetableDisplayDiv = document.getElementById('timetableDisplay');
+            timetableDisplayDiv.innerHTML = '';
+
+            const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+            try {
+                const classDoc = await db.collection('classes').doc(currentClass).get();
+                if (classDoc.exists) {
+                    classesData[currentClass].timetable = classDoc.data().timetable || {};
+                }
+
+                daysOfWeek.forEach(day => {
+                    const dayTimetable = classesData[currentClass].timetable[day] || [];
+                    const daySection = document.createElement('div');
+                    daySection.className = 'timetable-day-section';
+                    daySection.innerHTML = `<h5>${day}</h5>`;
+
+                    if (dayTimetable.length === 0) {
+                        daySection.innerHTML += `<p style="color: #666; font-style: italic;">No subjects scheduled for ${day}.</p>`;
+                    } else {
+                        // Sort by hour for better display
+                        const sortedTimetable = [...dayTimetable].sort((a, b) => {
+                            const hourA = isNaN(a.hour) ? a.hour : parseInt(a.hour);
+                            const hourB = isNaN(b.hour) ? b.hour : parseInt(b.hour);
+                            if (typeof hourA === 'number' && typeof hourB === 'number') {
+                                return hourA - hourB;
+                            }
+                            return hourA.toString().localeCompare(hourB.toString());
+                        });
+
+                        sortedTimetable.forEach((entry, index) => {
+                            const entryDiv = document.createElement('div');
+                            entryDiv.className = 'timetable-item';
+                            entryDiv.innerHTML = `
+                                <div class="timetable-info">
+                                    <div class="timetable-subject">${entry.subject} (Hour ${entry.hour})</div>
+                                    <div class="timetable-teacher">Teacher: ${entry.teacher} (${classesData[currentClass].teachers[entry.teacher] || 'No phone'})</div>
+                                </div>
+                                <button class="btn-danger" onclick="removeTimetableEntry('${day}', '${entry.subject}', '${entry.hour}')">Remove</button>
+                            `;
+                            daySection.appendChild(entryDiv);
+                        });
+                    }
+                    timetableDisplayDiv.appendChild(daySection);
+                });
+            } catch (error) {
+                console.error("Error loading timetable:", error);
+                alert("Error loading timetable. Check console for details.");
+            }
+        }
+
+        // Attendance functions (Modified for Subject-Hour wise)
+        function setTodayDate() {
+            const today = new Date();
+            const dateString = today.toISOString().split('T')[0];
+            document.getElementById('attendanceDate').value = dateString;
+        }
+
+        async function loadAttendance() {
+            if (!currentClass) return;
+
+            const date = document.getElementById('attendanceDate').value;
+            if (!date) return;
+
+            const hourlyAttendanceGrid = document.getElementById('hourlyAttendanceGrid');
+            hourlyAttendanceGrid.innerHTML = '';
+
+            const students = classesData[currentClass].students;
+            const selectedDate = new Date(date);
+            const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+            const timetableForDay = classesData[currentClass].timetable[dayOfWeek] || [];
+
+            if (students.length === 0) {
+                hourlyAttendanceGrid.innerHTML = `<div class="no-class">No students added to this class.</div>`;
+                updateStats();
+                return;
+            }
+
+            if (timetableForDay.length === 0) {
+                hourlyAttendanceGrid.innerHTML = `<div class="no-class">No timetable set for ${dayOfWeek}. Please add subjects in Timetable Management.</div>`;
+                updateStats();
+                return;
+            }
+
+            // Load attendance for the specific date from Firestore
+            let attendanceForDate = {};
+            try {
+                const doc = await db.collection('classes').doc(currentClass).collection('dailyAttendance').doc(date).get();
+                if (doc.exists) {
+                    attendanceForDate = doc.data();
+                }
+            } catch (error) {
+                console.error("Error loading daily attendance from Firestore:", error);
+                alert("Error loading daily attendance. Check console for details.");
+            }
+            classesData[currentClass].attendance[date] = attendanceForDate; // Update local cache
+
+            // Sort timetable entries by hour
+            const sortedTimetable = [...timetableForDay].sort((a, b) => {
+                const hourA = isNaN(a.hour) ? a.hour : parseInt(a.hour);
+                const hourB = isNaN(b.hour) ? b.hour : parseInt(b.hour);
+                if (typeof hourA === 'number' && typeof hourB === 'number') {
+                    return hourA - hourB;
+                }
+                return hourA.toString().localeCompare(hourB.toString());
+            });
+
+            sortedTimetable.forEach(subjectEntry => {
+                const subjectName = subjectEntry.subject;
+                const teacherName = subjectEntry.teacher;
+                const hour = subjectEntry.hour;
+                const subjectHourKey = `${subjectName}_${hour}`;
+
+                if (!classesData[currentClass].attendance[date][subjectHourKey]) {
+                    classesData[currentClass].attendance[date][subjectHourKey] = {};
+                    // Initialize all students as 'present' for this new subject-hour/date
+                    students.forEach(student => {
+                        classesData[currentClass].attendance[date][subjectHourKey][student.roll] = 'present';
+                    });
+                }
+
+                const subjectHourAttendanceData = classesData[currentClass].attendance[date][subjectHourKey];
+
+                const subjectSection = document.createElement('div');
+                subjectSection.className = 'subject-attendance-section';
+                subjectSection.innerHTML = `
+                    <h4>${subjectName} - Hour ${hour} <small>(Teacher: ${teacherName})</small></h4>
+                    <div class="attendance-grid" id="attendanceGrid-${subjectHourKey.replace(/\s/g, '-')}" data-subject-hour="${subjectHourKey}"></div>
+                `;
+                hourlyAttendanceGrid.appendChild(subjectSection);
+
+                const currentAttendanceGrid = subjectSection.querySelector('.attendance-grid');
+
+                students.forEach(student => {
+                    const status = subjectHourAttendanceData[student.roll] || 'present';
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = `attendance-card ${status === 'present' ? 'status-present' : status === 'absent' ? 'status-absent' : ''}`;
+                    
+                    cardDiv.innerHTML = `
+                        <div class="status-badge ${status}">${status === 'present' ? 'Present' : status === 'absent' ? 'Absent' : 'Unmarked'}</div>
+                        <div class="attendance-info">
+                            <div class="student-name">${student.name}</div>
+                            <div class="student-roll">Roll: ${student.roll}</div>
+                            <div class="student-percentage">${subjectName} - Hour ${hour}</div>
+                        </div>
+                        <div class="attendance-buttons">
+                            <button class="btn-present ${status === 'present' ? 'active' : ''}" onclick="markAttendance('${student.roll}', 'present', '${subjectHourKey}')">Present</button>
+                            <button class="btn-absent ${status === 'absent' ? 'active' : ''}" onclick="markAttendance('${student.roll}', 'absent', '${subjectHourKey}')">Absent</button>
+                        </div>
+                    `;
+                    currentAttendanceGrid.appendChild(cardDiv);
+                });
+            });
+            updateStats();
+        }
+
+        async function markAttendance(roll, status, subjectHourKey) {
+            if (!currentClass) return;
+
+            const date = document.getElementById('attendanceDate').value;
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            if (!classesData[currentClass].attendance[date]) {
+                classesData[currentClass].attendance[date] = {};
+            }
+            if (!classesData[currentClass].attendance[date][subjectHourKey]) {
+                classesData[currentClass].attendance[date][subjectHourKey] = {};
+            }
+
+            classesData[currentClass].attendance[date][subjectHourKey][roll] = status;
+            
+            // Update only the specific student's status for that subjectHourKey in Firestore
+            try {
+                // Use a transaction to ensure atomicity if multiple users might update the same record
+                await db.runTransaction(async (transaction) => {
+                    const docRef = db.collection('classes').doc(currentClass).collection('dailyAttendance').doc(date);
+                    const doc = await transaction.get(docRef);
+
+                    let currentAttendanceData = {};
+                    if (doc.exists) {
+                        currentAttendanceData = doc.data();
+                    }
+
+                    // Ensure the subjectHourKey object exists
+                    if (!currentAttendanceData[subjectHourKey]) {
+                        currentAttendanceData[subjectHourKey] = {};
+                    }
+                    currentAttendanceData[subjectHourKey][roll] = status;
+
+                    transaction.set(docRef, currentAttendanceData);
+                });
+                loadAttendance(); // Reload to update UI
+            } catch (error) {
+                console.error("Error marking attendance:", error);
+                alert("Error marking attendance. Check console for details.");
+            }
+        }
+
+        async function saveAttendance() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+            
+            // The markAttendance function already saves individual changes.
+            // This function can be used to ensure all current day's attendance is pushed.
+            const date = document.getElementById('attendanceDate').value;
+            if (!date) {
+                alert('Please select a date');
+                return;
+            }
+
+            if (classesData[currentClass].attendance[date]) {
+                try {
+                    await db.collection('classes').doc(currentClass).collection('dailyAttendance').doc(date).set(classesData[currentClass].attendance[date]);
+                    alert('Attendance saved successfully!');
+                } catch (error) {
+                    console.error("Error saving attendance:", error);
+                    alert("Error saving attendance. Check console for details.");
+                }
+            } else {
+                alert('No attendance data to save for the selected date.');
+            }
+        }
+
+        function updateStats() {
+            if (!currentClass) {
+                document.getElementById('stats').style.display = 'none';
+                return;
+            }
+
+            const date = document.getElementById('attendanceDate').value;
+            const students = classesData[currentClass].students;
+            const selectedDate = new Date(date);
+            const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+            const timetableForDay = classesData[currentClass].timetable[dayOfWeek] || [];
+
+            let totalStudentsMarked = 0;
+            let totalPresent = 0;
+            let totalAbsent = 0;
+
+            if (students.length > 0 && timetableForDay.length > 0) {
+                timetableForDay.forEach(subjectEntry => {
+                    const subjectHourKey = `${subjectEntry.subject}_${subjectEntry.hour}`;
+                    const attendanceDataForSubjectHour = classesData[currentClass].attendance[date]?.[subjectHourKey] || {};
+                    
+                    students.forEach(student => {
+                        const status = attendanceDataForSubjectHour[student.roll];
+                        if (status === 'present') {
+                            totalPresent++;
+                            totalStudentsMarked++;
+                        } else if (status === 'absent') {
+                            totalAbsent++;
+                            totalStudentsMarked++;
+                        }
+                    });
+                });
+            }
+
+            const statsDiv = document.getElementById('stats');
+            if (totalStudentsMarked > 0) {
+                statsDiv.style.display = 'block';
+                statsDiv.innerHTML = `
+                    <h4>Overall Attendance Statistics for ${date}</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item stat-total">
+                            <div>Total Student-Hour Marks</div>
+                            <div style="font-size: 1.5em;">${totalStudentsMarked}</div>
+                        </div>
+                        <div class="stat-item stat-present">
+                            <div>Total Present Marks</div>
+                            <div style="font-size: 1.5em;">${totalPresent}</div>
+                        </div>
+                        <div class="stat-item stat-absent">
+                            <div>Total Absent Marks</div>
+                            <div style="font-size: 1.5em;">${totalAbsent}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                statsDiv.style.display = 'none';
+            }
+        }
+
+        // Data export/import functions (Local JSON export/import)
+        function exportData() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const dataToExport = {
+                className: currentClass,
+                data: classesData[currentClass]
+            };
+
+            const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentClass}_attendance_data.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function importData() {
+            const file = document.getElementById('importFile').files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (importedData.className && importedData.data) {
+                        const className = importedData.className;
+                        
+                        if (classesData[className] && !confirm(`Class "${className}" already exists. Do you want to overwrite it?`)) {
+                            return;
+                        }
+                        
+                        // Import to Firestore
+                        const classRef = db.collection('classes').doc(className);
+                        const batch = db.batch();
+
+                        // Set class-level data
+                        batch.set(classRef, {
+                            name: className,
+                            tutorPhone: importedData.data.tutorPhone || '',
+                            teachers: importedData.data.teachers || {},
+                            timetable: importedData.data.timetable || {}
+                        });
+
+                        // Import students and their custom attendance
+                        const studentsCollection = classRef.collection('students');
+                        importedData.data.students.forEach(student => {
+                            const studentDataToSave = {
+                                name: student.name,
+                                roll: student.roll,
+                                customAttendance: importedData.data.customAttendance[student.roll] || {}
+                            };
+                            batch.set(studentsCollection.doc(student.roll), studentDataToSave);
+                        });
+
+                        // Import daily attendance
+                        const dailyAttendanceCollection = classRef.collection('dailyAttendance');
+                        for (const date in importedData.data.attendance) {
+                            batch.set(dailyAttendanceCollection.doc(date), importedData.data.attendance[date]);
+                        }
+
+                        await batch.commit();
+                        
+                        // Reload local data from Firestore after successful import
+                        await loadFromMemory();
+                        populateClassSelect();
+                        selectClass(className);
+                        alert('Data imported successfully!');
+                    } else {
+                        alert('Invalid file format. Expected a JSON with "className" and "data" properties.');
+                    }
+                } catch (error) {
+                    alert('Error reading or importing file: ' + error.message);
+                    console.error("Import error:", error);
+                }
+            };
+            reader.readAsText(file);
+            
+            document.getElementById('importFile').value = '';
+        }
+
+        // Tutor WhatsApp functions
+        async function saveTutorPhone() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const phone = document.getElementById('tutorPhone').value.trim();
+            if (!phone) {
+                alert('Please enter a phone number');
+                return;
+            }
+
+            const phoneRegex = /^\+[1-9]\d{1,14}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('Please enter a valid phone number with country code (e.g., +1234567890)');
+                return;
+            }
+
+            classesData[currentClass].tutorPhone = phone;
+            try {
+                await db.collection('classes').doc(currentClass).update({
+                    tutorPhone: phone
+                });
+                alert('Class Tutor phone number saved successfully!');
+            } catch (error) {
+                console.error("Error saving tutor phone:", error);
+                alert("Error saving tutor phone. Check console for details.");
+            }
+        }
+
+        async function loadTutorPhone() {
+            if (!currentClass) return;
+            
+            try {
+                const classDoc = await db.collection('classes').doc(currentClass).get();
+                if (classDoc.exists) {
+                    classesData[currentClass].tutorPhone = classDoc.data().tutorPhone || '';
+                }
+                document.getElementById('tutorPhone').value = classesData[currentClass].tutorPhone;
+            } catch (error) {
+                console.error("Error loading tutor phone:", error);
+                alert("Error loading tutor phone. Check console for details.");
+            }
+        }
+
+        async function sendAbsenteesToTutor() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const date = document.getElementById('attendanceDate').value;
+            if (!date) {
+                alert('Please select a date first');
+                return;
+            }
+
+            const tutorPhone = classesData[currentClass].tutorPhone;
+            if (!tutorPhone) {
+                alert('Please set the Class Tutor\'s WhatsApp number first in Student Management section.');
+                return;
+            }
+
+            const students = classesData[currentClass].students;
+            
+            let attendanceForDate = {};
+            try {
+                const doc = await db.collection('classes').doc(currentClass).collection('dailyAttendance').doc(date).get();
+                if (doc.exists) {
+                    attendanceForDate = doc.data();
+                }
+            } catch (error) {
+                console.error("Error fetching attendance for absentee report:", error);
+                alert("Error generating report. Check console for details.");
+                return;
+            }
+
+            let overallAbsentees = new Set();
+            const selectedDate = new Date(date);
+            const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+            const timetableForDay = classesData[currentClass].timetable[dayOfWeek] || [];
+
+            if (timetableForDay.length === 0) {
+                alert(`No timetable set for ${dayOfWeek}. Cannot generate overall absentee report.`);
+                return;
+            }
+
+            timetableForDay.forEach(subjectEntry => {
+                const subjectHourKey = `${subjectEntry.subject}_${subjectEntry.hour}`;
+                const subjectHourAttendance = attendanceForDate[subjectHourKey] || {};
+
+                students.forEach(student => {
+                    const status = subjectHourAttendance[student.roll];
+                    if (status === 'absent') {
+                        overallAbsentees.add(student.roll);
+                    }
+                });
+            });
+
+            const uniqueAbsentees = Array.from(overallAbsentees).map(roll => 
+                students.find(s => s.roll === roll)
+            ).filter(Boolean);
+
+            if (uniqueAbsentees.length === 0) {
+                alert('No absentees found for the selected date across all subjects.');
+                return;
+            }
+
+            let message = `📚 *Overall Attendance Report*\n`;
+            message += `🏫 *Class:* ${currentClass}\n`;
+            message += `📅 *Date:* ${new Date(date).toLocaleDateString()}\n\n`;
+            message += `👥 *Total Students in Class:* ${students.length}\n`;
+            message += `❌ *Unique Absentees (${uniqueAbsentees.length}):*\n\n`;
+            
+            uniqueAbsentees.forEach((student, index) => {
+                message += `${index + 1}. ${student.name} (${student.roll})\n`;
+            });
+
+            message += `\n_Sent via Smart Attendance Manager_`;
+
+            const cleanPhone = tutorPhone.replace('+', '');
+            const whatsappURL = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappURL, '_blank');
+        }
+
+        // Send subject-wise reports to teachers
+        async function sendAbsenteesToWhatsAppBySubject() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const date = document.getElementById('attendanceDate').value;
+            if (!date) {
+                alert('Please select a date first');
+                return;
+            }
+
+            const students = classesData[currentClass].students;
+            const teachers = classesData[currentClass].teachers || {};
+
+            let attendanceForDate = {};
+            try {
+                const doc = await db.collection('classes').doc(currentClass).collection('dailyAttendance').doc(date).get();
+                if (doc.exists) {
+                    attendanceForDate = doc.data();
+                }
+            } catch (error) {
+                console.error("Error fetching attendance for subject report:", error);
+                alert("Error generating report. Check console for details.");
+                return;
+            }
+
+            const selectedDate = new Date(date);
+            const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+            const timetableForDay = classesData[currentClass].timetable[dayOfWeek] || [];
+
+            if (timetableForDay.length === 0) {
+                alert(`No timetable set for ${dayOfWeek}. Cannot send subject-wise absentee reports.`);
+                return;
+            }
+
+            // Group by teacher to send consolidated reports
+            const teacherReports = {};
+
+            timetableForDay.forEach(subjectEntry => {
+                const subjectName = subjectEntry.subject;
+                const teacherName = subjectEntry.teacher;
+                const hour = subjectEntry.hour;
+                const teacherPhone = teachers[teacherName];
+
+                if (!teacherPhone) {
+                    console.warn(`No phone number found for teacher "${teacherName}". Skipping report.`);
+                    return;
+                }
+
+                const subjectHourKey = `${subjectName}_${hour}`;
+                const subjectHourAttendance = attendanceForDate[subjectHourKey] || {};
+                
+                const absentees = students.filter(student => 
+                    subjectHourAttendance[student.roll] === 'absent'
+                );
+                const presentCount = students.filter(student => 
+                    subjectHourAttendance[student.roll] === 'present'
+                ).length;
+
+                if (!teacherReports[teacherName]) {
+                    teacherReports[teacherName] = {
+                        phone: teacherPhone,
+                        subjects: []
+                    };
+                }
+
+                teacherReports[teacherName].subjects.push({
+                    subject: subjectName,
+                    hour: hour,
+                    absentees: absentees,
+                    presentCount: presentCount
+                });
+            });
+
+            let reportsSent = 0;
+            Object.keys(teacherReports).forEach(teacherName => {
+                const report = teacherReports[teacherName];
+                const hasAbsentees = report.subjects.some(s => s.absentees.length > 0);
+
+                if (hasAbsentees) {
+                    let message = `📚 *Attendance Report*\n`;
+                    message += `🏫 *Class:* ${currentClass}\n`;
+                    message += `📅 *Date:* ${new Date(date).toLocaleDateString()}\n`;
+                    message += `👨‍🏫 *Teacher:* ${teacherName}\n\n`;
+
+                    report.subjects.forEach(subjectInfo => {
+                        if (subjectInfo.absentees.length > 0) {
+                            message += `📖 *${subjectInfo.subject} - Hour ${subjectInfo.hour}*\n`;
+                            message += `👥 Present: ${subjectInfo.presentCount}\n`;
+                            message += `❌ Absentees (${subjectInfo.absentees.length}):\n`;
+                            
+                            subjectInfo.absentees.forEach((student, index) => {
+                                message += `${index + 1}. ${student.name} (${student.roll})\n`;
+                            });
+                            message += `\n`;
+                        }
+                    });
+
+                    message += `_Sent via Smart Attendance Manager_`;
+
+                    const cleanPhone = report.phone.replace('+', '');
+                    const whatsappURL = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappURL, '_blank');
+                    reportsSent++;
+                }
+            });
+
+            if (reportsSent === 0) {
+                alert('No absentees found for any subject, or no teacher phone numbers set for subjects with absentees.');
+            } else {
+                alert(`Generated ${reportsSent} WhatsApp reports for teachers.`);
+            }
+        }
+
+        // Function to view historical attendance
+        async function viewHistoricalAttendance() {
+            if (!currentClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const date = document.getElementById('historyDate').value;
+            if (!date) {
+                alert('Please select a date to view history.');
+                return;
+            }
+
+            const historicalDisplay = document.getElementById('historicalAttendanceDisplay');
+            historicalDisplay.innerHTML = '<p style="text-align: center;">Loading history...</p>';
+
+            try {
+                const docRef = db.collection('classes').doc(currentClass).collection('dailyAttendance').doc(date);
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const attendanceDataForDate = doc.data();
+                    // Ensure students are loaded before displaying history
+                    if (classesData[currentClass].students.length === 0) {
+                        await loadStudents(); 
+                    }
+                    const students = classesData[currentClass].students;
+
+                    let historyHtml = `<h4>Attendance for ${new Date(date).toLocaleDateString()}</h4>`;
+                    historyHtml += `<div class="attendance-grid">`;
+
+                    // Get timetable for the day to display subjects
+                    const selectedDate = new Date(date);
+                    const dayOfWeek = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+                    const timetableForDay = classesData[currentClass].timetable[dayOfWeek] || [];
+
+                    if (timetableForDay.length === 0) {
+                        historyHtml += `<p class="no-class">No timetable set for ${dayOfWeek} for this class.</p>`;
+                    } else {
+                        const sortedTimetable = [...timetableForDay].sort((a, b) => {
+                            const hourA = isNaN(a.hour) ? a.hour : parseInt(a.hour);
+                            const hourB = isNaN(b.hour) ? b.hour : parseInt(b.hour);
+                            if (typeof hourA === 'number' && typeof hourB === 'number') {
+                                return hourA - hourB;
+                            }
+                            return hourA.toString().localeCompare(hourB.toString());
+                        });
+
+                        sortedTimetable.forEach(subjectEntry => {
+                            const subjectName = subjectEntry.subject;
+                            const hour = subjectEntry.hour;
+                            const subjectHourKey = `${subjectName}_${hour}`;
+                            const subjectHourAttendance = attendanceDataForDate[subjectHourKey] || {};
+
+                            historyHtml += `<div class="subject-attendance-section">
+                                <h5>${subjectName} - Hour ${hour}</h5>
+                                <ul style="list-style: none; padding: 0;">`;
+                            
+                            students.forEach(student => {
+                                const status = subjectHourAttendance[student.roll] || 'Unmarked';
+                                const statusClass = status === 'present' ? 'status-present' : status === 'absent' ? 'status-absent' : '';
+                                historyHtml += `<li class="student-item ${statusClass}" style="margin-bottom: 5px; padding: 10px; border-radius: 8px; border: 1px solid #eee;">
+                                    <div class="student-info">
+                                        <div class="student-name">${student.name}</div>
+                                        <div class="student-roll">Roll: ${student.roll}</div>
+                                    </div>
+                                    <span class="status-badge ${status.toLowerCase()}">${status}</span>
+                                </li>`;
+                            });
+                            historyHtml += `</ul></div>`;
+                        });
+                    }
+                    historyHtml += `</div>`;
+                    historicalDisplay.innerHTML = historyHtml;
+                } else {
+                    historicalDisplay.innerHTML = `<p style="text-align: center; color: #666;">No attendance records found for ${new Date(date).toLocaleDateString()}.</p>`;
+                }
+            } catch (error) {
+                console.error("Error fetching historical attendance:", error);
+                historicalDisplay.innerHTML = `<p style="text-align: center; color: red;">Error loading history. Please try again.</p>`;
+            }
+        }
+
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('studentModal');
+            if (event.target === modal) {
+                closeStudentModal();
+            }
+        }
+
+        // Initialize the app when page loads
+        window.onload = initApp;
+    </script>
+</body>
+</html>
